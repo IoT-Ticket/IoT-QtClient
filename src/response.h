@@ -23,6 +23,8 @@
 #ifndef RESPONSE_H
 #define RESPONSE_H
 
+#include "iotlib_global.h"
+
 #include <QObject>
 #include <QScopedPointer>
 #include <QNetworkReply>
@@ -32,7 +34,7 @@ class QJsonDocument;
 namespace iot
 {
 
-class Response : public QObject
+class IOTLIBSHARED_EXPORT Response : public QObject
 {
     Q_OBJECT
 public:

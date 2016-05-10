@@ -67,7 +67,6 @@ void DeviceListPrivate::onGetFinished()
                 Q_UNUSED(fullSize);
                 QJsonArray items = rootObject["items"].toArray();
                 if (!items.isEmpty()) {
-                    qDebug() << "items count " << items.count();
                     foreach (const QJsonValue& item, items) {
                         if (item.isObject()) {
                             Device* device = Device::fromJson(item.toObject());

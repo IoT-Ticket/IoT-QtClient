@@ -23,6 +23,8 @@
 #ifndef REQUESTHANDLER_H
 #define REQUESTHANDLER_H
 
+#include "iotlib_global.h"
+
 #include <QNetworkAccessManager>
 #include <QObject>
 #include <QUrl>
@@ -35,7 +37,7 @@ namespace iot
 
 class Response;
 
-class RequestHandler : public QObject
+class IOTLIBSHARED_EXPORT RequestHandler : public QObject
 {
     Q_OBJECT
 public:

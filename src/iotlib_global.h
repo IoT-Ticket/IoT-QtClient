@@ -25,14 +25,10 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(QT_DLL)
 #if defined(IOT_LIBRARY)
 #  define IOTLIBSHARED_EXPORT Q_DECL_EXPORT
 #else
 #  define IOTLIBSHARED_EXPORT Q_DECL_IMPORT
-#endif
-#else
-#  define IOTLIBSHARED_EXPORT
 #endif
 
 #endif // IOTLIB_GLOBAL_H

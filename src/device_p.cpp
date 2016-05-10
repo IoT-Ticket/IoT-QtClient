@@ -193,7 +193,6 @@ void DevicePrivate::onGetDataNodesFinished()
         if (isValidResponse(*m_getDataNodesResponse, m_getDataNodesError, 200)) {
             error = false;
             QJsonObject rootObject = getObject(m_getDataNodesResponse->document());
-            qDebug() << rootObject;
             // TODO handle partial response
             int offset = getValue(rootObject, "offset", QJsonValue::Double).toInt();
             Q_UNUSED(offset);
@@ -205,8 +204,10 @@ void DevicePrivate::onGetDataNodesFinished()
             if (!items.isEmpty()) {
                 foreach (auto item, items) {
                     DataNode* dataNode = DataNode::fromJson(getObject(item));
-                    if (dataNode) m_dataNodes << dataNode;
-                    else {
+                    if (dataNode) {
+                        dataNode->setDeviceId(m_deviceId);
+                        m_dataNodes << dataNode;
+                    } else {
                         throw JsonError();
                     }
                 }
