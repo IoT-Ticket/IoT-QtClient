@@ -34,11 +34,27 @@ connection->setPassword("password");
 ### Registering a device
 
 ```cpp
-iot::Device device;
-device.setName("Device Name");
-device.setManufacturer("Manufacturer Name");
-device.setDescription("Device description");
-device.registerDevice();
+    iot::Device* device = new iot::Device();
+    device->setManufacturer("Device manufacturer");
+    device->setDescription("Device description");
+    device->setName("Device name");
+    device->setType("Device type");
+    QVariantMap attributes;
+    attributes["id"] = 123;
+    device->setAttributes(attributes);
+    connect(device, &iot::Device::registerFinished, [=](bool success) {
+        if (success) {
+            qDebug() << "done";
+            QString deviceId = device->deviceId();
+            // device id needed in future operations
+            device->deleteLater();
+        } else {
+            qDebug() << "Error";
+        }
+    } );
+
+    device->registerDevice();
+
 ```
 
 ### Listing devices
