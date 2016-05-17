@@ -48,7 +48,8 @@ bool DataNodePrivate::initialize(const QJsonObject& object)
     error &= resolveKeyAndCallSetter(object, "unit", [&](const QString& unit) { q->setUnit(unit); } );
     error &= resolveKeyAndCallSetter(object, "href", [&](const QString& href) { q->setHref(href); } );
     error &= resolveKeyAndCallSetter(object, "name", [&](const QString& name) { q->setName(name); } );
-    error &= resolveKeyAndCallSetter(object, "path", [&](const QString& path) { q->setPath(path); } );
+    // path not mandatory since its possible to register node without a path
+    resolveKeyAndCallSetter(object, "path", [&](const QString& path) { q->setPath(path); } );
     error &= resolveKeyAndCallSetter(object, "dataType", [&](const QString& dataType) {
         const QMetaEnum me = QMetaEnum::fromType<DataNode::DataType>();
         bool found = true;
@@ -115,14 +116,19 @@ bool DataNodePrivate::readValues(const QDateTime& startTime, const QDateTime& en
     return true;
 }
 
-void DataNodePrivate::addReadValues(const QJsonArray& values)
+void DataNodePrivate::addReadValues(const QJsonArray& values, bool notify)
 {
+    Q_Q(DataNode);
     foreach(auto valueVal, values) {
         const QJsonObject obj = getObject(valueVal);
         QPair<QVariant, QDateTime> valueTimePair;
-        valueTimePair.first = getSingleValue(obj, "v");
+        valueTimePair.first = getSingleValue(obj, "v").toVariant();
         valueTimePair.second = QDateTime::fromMSecsSinceEpoch( (qint64)getValue(obj, "ts", QJsonValue::Double).toDouble());
         m_values << valueTimePair;
+    }
+
+    if (notify) {
+        emit q->readFinished(true);
     }
 }
 
@@ -195,7 +201,7 @@ void DataNodePrivate::onReadFinished()
             const QJsonArray results = getValue(rootObject, "datanodeReads", QJsonValue::Array).toArray();
             foreach( auto val, results) {
                 const QJsonArray valueArray = getValue(getObject(val), "values", QJsonValue::Array).toArray();
-                addReadValues(valueArray);
+                addReadValues(valueArray, false);
             }
         }
     } catch (std::exception& exception) {

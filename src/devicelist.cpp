@@ -44,6 +44,14 @@ QList<Device*> DeviceList::devices()
     return d->m_devices;
 }
 
+QList<Device*> DeviceList::takeDevices()
+{
+    Q_D(DeviceList);
+    QList<Device*> devices = d->m_devices;
+    d->m_devices.clear();
+    return devices;
+}
+
 Error* DeviceList::getError()
 {
     Q_D(DeviceList);

@@ -63,6 +63,13 @@ public:
     //! \return Device list.
     QList<Device*> devices();
 
+    //! \brief Take devices list.
+    //!
+    //! Ownership is transferred and DeviceList' devices list is cleared.
+    //!
+    //! \return Device list.
+    QList<Device*> takeDevices();
+
     //! \brief Return details from get error.
     //! \return Error details.
     Error* getError();

@@ -57,7 +57,7 @@ public:
     bool writeValues(const QList<QPair<QVariant, qint64>>& list);
     bool writeCachedValues();
     bool readValues(const QDateTime& startTime = QDateTime(), const QDateTime& endTime = QDateTime());
-    void addReadValues(const QJsonArray& values);
+    void addReadValues(const QJsonArray& values, bool notify = true);
     bool isReadyToWrite() const;
     bool isReadyToRead() const;
 

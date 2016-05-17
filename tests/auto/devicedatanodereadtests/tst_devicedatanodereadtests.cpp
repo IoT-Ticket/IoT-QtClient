@@ -103,19 +103,19 @@ private:
     QSignalSpy* m_readFailedSpy;
 };
 
-inline void testConfiguration()
+inline void testConfiguration(bool forceAddToDevice = false)
 {
     QTest::addColumn<int>("nodeCount");
     QTest::addColumn<bool>("usePath");
     QTest::addColumn<bool>("addToServer");
 
-    QTest::newRow("one node") << 1 << false << false;
-    QTest::newRow("one node with path") << 1 << true << false;
-    QTest::newRow("one node with path added to server") << 1 << true << true;
+    QTest::newRow("one node") << 1 << false << (forceAddToDevice ? true : false);
+    QTest::newRow("one node with path") << 1 << true << (forceAddToDevice ? true : false);
+    QTest::newRow("one node with path added to server") << 1 << true << (forceAddToDevice ? true : true);
 
-    QTest::newRow("three nodes") << 1 << false << false;
-    QTest::newRow("three nodes with path") << 1 << true << false;
-    QTest::newRow("three nodes with path added to server") << 1 << true << true;
+    QTest::newRow("three nodes") << 1 << false << (forceAddToDevice ? true : false);
+    QTest::newRow("three nodes with path") << 1 << true << (forceAddToDevice ? true : false);
+    QTest::newRow("three nodes with path added to server") << 1 << true << (forceAddToDevice ? true : true);
 }
 
 void DeviceDataNodeReadTests::verifyRequestPath_data()
@@ -185,7 +185,7 @@ void DeviceDataNodeReadTests::verifyRequestPathFromDateProvided()
 
 void DeviceDataNodeReadTests::readReturnZeroEntries_data()
 {
-    testConfiguration();
+    testConfiguration(true);
 }
 
 void DeviceDataNodeReadTests::readReturnZeroEntries()
@@ -195,7 +195,11 @@ void DeviceDataNodeReadTests::readReturnZeroEntries()
     QFETCH(bool, addToServer);
     addNodes(nodeCount, usePath, addToServer);
 
-    m_device->readDataNodeValues(QDateTime::currentDateTime().addDays(-1));
+    if (addToServer) {
+        m_device->readDataNodeValues(QDateTime::currentDateTime().addDays(-1));
+    } else {
+        m_device->readDataNodeValues(QDateTime::currentDateTime().addDays(-1), m_dataNodes);
+    }
     QJsonObject obj;
     obj["datanodeReads"] = QJsonArray();
     obj["href"] = "foo";
@@ -207,7 +211,7 @@ void DeviceDataNodeReadTests::readReturnZeroEntries()
 
 void DeviceDataNodeReadTests::readReturnSeveralEntriesForOneNode()
 {
-    addNodes(false, 1, false);
+    addNodes(1, true, true);
     m_device->readDataNodeValues(QDateTime::currentDateTime().addDays(-1));
 
     QJsonArray valuesArray;
@@ -220,6 +224,7 @@ void DeviceDataNodeReadTests::readReturnSeveralEntriesForOneNode()
 
     QJsonObject nodeObj;
     nodeObj["name"] = m_dataNodes[0]->name();
+    nodeObj["path"] = m_dataNodes[0]->path();
     nodeObj["dataType"] = QMetaEnum::fromType<DataNode::DataType>().valueToKey(m_dataNodes[0]->dataType());
     nodeObj["values"] = valuesArray;
     QJsonArray nodeObjArray;
