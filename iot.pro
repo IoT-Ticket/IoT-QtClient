@@ -3,5 +3,5 @@ TEMPLATE = subdirs
 SUBDIRS += src
 
 CONFIG(debug, debug|release) {
-    SUBDIRS += tests examples/demo
+    SUBDIRS += examples tests
 }
