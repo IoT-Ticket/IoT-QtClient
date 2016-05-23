@@ -51,6 +51,8 @@ public:
     QDateTime m_creationTime;
     QVariantMap m_attributes;
     QList<DataNode*> m_dataNodes;
+    QList<DataNode*> m_writeNodes;
+    QList<DataNode*> m_readNodes;
     Error m_registerError;
     Error m_getError;
     Error m_getDataNodesError;
@@ -66,7 +68,7 @@ public:
     void getDataNodes(const QString& deviceId);
     bool initialize(const QJsonObject& object);
     void readDataNodeValues(QList<DataNode*> nodes, const QDateTime& startTime, const QDateTime& endTime);
-    DataNode* findDataNode(const QString& name, const QString& path);
+    DataNode* findDataNode(const QList<DataNode*>& nodes, const QString& name, const QString& path);
 
 protected slots:
 

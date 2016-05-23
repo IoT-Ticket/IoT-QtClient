@@ -54,6 +54,7 @@ private slots:
     void verifyRequestPathFromDateProvided();
     void readReturnZeroEntries_data();
     void readReturnZeroEntries();
+    void readReturnSeveralEntriesForOneNode_data();
     void readReturnSeveralEntriesForOneNode();
     void valuesClearedBetweenReadsForOneNode();
 
@@ -103,19 +104,19 @@ private:
     QSignalSpy* m_readFailedSpy;
 };
 
-inline void testConfiguration(bool forceAddToDevice = false)
+inline void testConfiguration()
 {
     QTest::addColumn<int>("nodeCount");
     QTest::addColumn<bool>("usePath");
     QTest::addColumn<bool>("addToServer");
 
-    QTest::newRow("one node") << 1 << false << (forceAddToDevice ? true : false);
-    QTest::newRow("one node with path") << 1 << true << (forceAddToDevice ? true : false);
-    QTest::newRow("one node with path added to server") << 1 << true << (forceAddToDevice ? true : true);
+    QTest::newRow("one node") << 1 << false << false;
+    QTest::newRow("one node with path") << 1 << true << false;
+    QTest::newRow("one node with path added to server") << 1 << true << true;
 
-    QTest::newRow("three nodes") << 1 << false << (forceAddToDevice ? true : false);
-    QTest::newRow("three nodes with path") << 1 << true << (forceAddToDevice ? true : false);
-    QTest::newRow("three nodes with path added to server") << 1 << true << (forceAddToDevice ? true : true);
+    QTest::newRow("three nodes") << 3 << false << false;
+    QTest::newRow("three nodes with path") << 3 << true << false;
+    QTest::newRow("three nodes with path added to server") << 3 << true << true;
 }
 
 void DeviceDataNodeReadTests::verifyRequestPath_data()
@@ -185,7 +186,7 @@ void DeviceDataNodeReadTests::verifyRequestPathFromDateProvided()
 
 void DeviceDataNodeReadTests::readReturnZeroEntries_data()
 {
-    testConfiguration(true);
+    testConfiguration();
 }
 
 void DeviceDataNodeReadTests::readReturnZeroEntries()
@@ -209,10 +210,22 @@ void DeviceDataNodeReadTests::readReturnZeroEntries()
     }
 }
 
+void DeviceDataNodeReadTests::readReturnSeveralEntriesForOneNode_data()
+{
+    QTest::addColumn<bool>("addNodeToDevice");
+    QTest::newRow("Node added to device") << true;
+    QTest::newRow("Node not added to device") <<  false;
+}
+
 void DeviceDataNodeReadTests::readReturnSeveralEntriesForOneNode()
 {
-    addNodes(1, true, true);
-    m_device->readDataNodeValues(QDateTime::currentDateTime().addDays(-1));
+    QFETCH(bool, addNodeToDevice);
+    addNodes(1, true, addNodeToDevice);
+    if (addNodeToDevice) {
+        m_device->readDataNodeValues(QDateTime::currentDateTime().addDays(-1));
+    } else {
+        m_device->readDataNodeValues(QDateTime::currentDateTime().addDays(-1), m_dataNodes);
+    }
 
     QJsonArray valuesArray;
     QPair<QVariant, QDateTime> val1(1,QDateTime::currentDateTime().addSecs(-5));
@@ -244,20 +257,20 @@ void DeviceDataNodeReadTests::readReturnSeveralEntriesForOneNode()
 
 void DeviceDataNodeReadTests::valuesClearedBetweenReadsForOneNode()
 {
-    readReturnSeveralEntriesForOneNode();
+    addNodes(1, true, true);
+    m_device->readDataNodeValues(QDateTime::currentDateTime().addDays(-1));
 
-    // Now lets read second set of values. Values function should return only the
-    // second set of values
-    m_dataNodes[0]->readValues(QDateTime::currentDateTime());
-
-    QPair<QVariant, QDateTime> val4(4,QDateTime::currentDateTime().addSecs(+10));
-    QPair<QVariant, QDateTime> val5(5,QDateTime::currentDateTime().addSecs(+15));
     QJsonArray valuesArray;
-    valuesArray << valueToObj(val4);
-    valuesArray << valueToObj(val5);
+    QPair<QVariant, QDateTime> val1(1,QDateTime::currentDateTime().addSecs(-5));
+    QPair<QVariant, QDateTime> val2(2,QDateTime::currentDateTime());
+    QPair<QVariant, QDateTime> val3(3,QDateTime::currentDateTime().addSecs(+5));
+    valuesArray << valueToObj(val1);
+    valuesArray << valueToObj(val2);
+    valuesArray << valueToObj(val3);
 
     QJsonObject nodeObj;
     nodeObj["name"] = m_dataNodes[0]->name();
+    nodeObj["path"] = m_dataNodes[0]->path();
     nodeObj["dataType"] = QMetaEnum::fromType<DataNode::DataType>().valueToKey(m_dataNodes[0]->dataType());
     nodeObj["values"] = valuesArray;
     QJsonArray nodeObjArray;
@@ -266,13 +279,30 @@ void DeviceDataNodeReadTests::valuesClearedBetweenReadsForOneNode()
     QJsonObject obj;
     obj["datanodeReads"] = nodeObjArray;
     obj["href"] = "foo";
-
-    // Simulate second response
-//    m_readCompleteSpy->clear();
     simulateGetResponse(200, QJsonDocument(obj));
 
-//    QCOMPARE( m_readCompleteSpy->count(), 1 );
-//    QCOMPARE( m_readFailedSpy->count(), 0 );
+    // Now lets read second set of values. Values function should return only the
+    // second set of values
+    m_dataNodes[0]->readValues(QDateTime::currentDateTime());
+
+    QPair<QVariant, QDateTime> val4(4,QDateTime::currentDateTime().addSecs(+10));
+    QPair<QVariant, QDateTime> val5(5,QDateTime::currentDateTime().addSecs(+15));
+    QJsonArray valuesArray2;
+    valuesArray2 << valueToObj(val4);
+    valuesArray2 << valueToObj(val5);
+
+    nodeObj["name"] = m_dataNodes[0]->name();
+    nodeObj["dataType"] = QMetaEnum::fromType<DataNode::DataType>().valueToKey(m_dataNodes[0]->dataType());
+    nodeObj["values"] = valuesArray2;
+    QJsonArray nodeObjArray2;
+    nodeObjArray2 << nodeObj;
+
+    obj["datanodeReads"] = nodeObjArray2;
+    obj["href"] = "foo";
+
+    // Simulate second response
+    simulateGetResponse(200, QJsonDocument(obj));
+
     QCOMPARE( m_dataNodes[0]->values().count(), 2 );
     QCOMPARE( m_dataNodes[0]->values()[0], val4 );
     QCOMPARE( m_dataNodes[0]->values()[1], val5 );

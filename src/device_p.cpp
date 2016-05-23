@@ -116,6 +116,8 @@ void DevicePrivate::readDataNodeValues(QList<DataNode*> nodes, const QDateTime& 
         return;
     }
 
+    m_readNodes = nodes;
+
     // Build node id list from nodes
     QString nodeIds;
     for(int i = 0; i < nodes.count(); i++) {
@@ -133,9 +135,9 @@ void DevicePrivate::readDataNodeValues(QList<DataNode*> nodes, const QDateTime& 
     QObject::connect( m_readDataNodeValuesResponse.data(), &Response::finished, this, &DevicePrivate::onReadDataNodeValuesFinished);
 }
 
-DataNode* DevicePrivate::findDataNode(const QString& name, const QString& path)
+DataNode* DevicePrivate::findDataNode(const QList<DataNode*>& nodes, const QString& name, const QString& path)
 {
-    foreach(auto node, m_dataNodes) {
+    foreach(auto node, nodes) {
         if (node->path() == path && node->name() == name) {
             return node;
         }
@@ -239,7 +241,7 @@ void DevicePrivate::onReadDataNodeValuesFinished()
                 QJsonObject valueObject = getObject(val);
                 QString name = valueObject["name"].toString();
                 QString path = valueObject["path"].toString();
-                DataNode* node = findDataNode(name, path);
+                DataNode* node = findDataNode(m_readNodes, name, path);
                 if (node) {
                     node->addReadValues( getValue(valueObject, "values", QJsonValue::Array).toArray() );
                 }
