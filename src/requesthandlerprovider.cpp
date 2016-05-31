@@ -30,10 +30,10 @@ std::atomic<RequestHandler*> RequestHandlerProvider::m_instance(nullptr);
 std::mutex RequestHandlerProvider::m_mutex;
 
 RequestHandler* RequestHandlerProvider::instance() {
-    if (m_instance == nullptr) {
+    if (m_instance.load() == nullptr) {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_instance == nullptr) {
-            m_instance = new RequestHandler();
+        if (m_instance.load() == nullptr) {
+            m_instance.store(new RequestHandler());
         }
     }
 

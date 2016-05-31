@@ -45,10 +45,10 @@ ConnectionPrivate::~ConnectionPrivate()
 
 Connection* ConnectionPrivate::connectionInstance()
 {
-    if (m_instance == nullptr) {
+    if (m_instance.load() == nullptr) {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_instance == nullptr) {
-            m_instance = new Connection();
+        if (m_instance.load() == nullptr) {
+            m_instance.store(new Connection());
         }
     }
 
