@@ -157,7 +157,7 @@ public:
 
     //! \brief Inequality operator.
     //! \return Are device properties inequal.
-    bool operator !=(const Device& other) const { return other != *this; }
+    bool operator !=(const Device& other) const { return !operator==(other); }
 
 public slots:
 

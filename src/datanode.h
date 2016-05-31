@@ -220,7 +220,7 @@ public:
 
     //! \brief Inequality operator.
     //! \return Are datanode properties inequal.
-    bool operator !=(const DataNode& other) const { return other != *this; }
+    bool operator !=(const DataNode& other) const { return !operator==(other); }
 
 public slots:
 
