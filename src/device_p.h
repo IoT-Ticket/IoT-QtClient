@@ -59,7 +59,7 @@ public:
     Error m_readDataNodeValuesError;
 
     QScopedPointer<Response> m_createResponse;
-    QScopedPointer<Response> m_getResponse;
+    QScopedPointer<Response> m_getDetailsResponse;
     QScopedPointer<Response> m_getDataNodesResponse;
     QScopedPointer<Response> m_readDataNodeValuesResponse;
 
@@ -73,7 +73,7 @@ public:
 protected slots:
 
     void onCreateFinished();
-    void onGetFinished();
+    void onGetDetailsFinished();
     void onGetDataNodesFinished();
     void onReadDataNodeValuesFinished();
 

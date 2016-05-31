@@ -60,8 +60,8 @@ void DevicePrivate::registerDevice() {
 
 void DevicePrivate::getDetails(const QString& deviceId) {
     QString id = deviceId.isEmpty() ? m_deviceId : deviceId;
-    m_getResponse.reset( RequestHandlerProvider::instance()->getRequest("/devices/" + id) );
-    QObject::connect( m_getResponse.data(), &Response::finished, this, &DevicePrivate::onGetFinished);
+    m_getDetailsResponse.reset( RequestHandlerProvider::instance()->getRequest("/devices/" + id) );
+    QObject::connect( m_getDetailsResponse.data(), &Response::finished, this, &DevicePrivate::onGetDetailsFinished);
 }
 
 void DevicePrivate::getDataNodes(const QString& deviceId)
@@ -94,18 +94,18 @@ bool DevicePrivate::initialize(const QJsonObject& object)
         }
         q->setAttributes(attributesMap);
     } else {
-        // TODO, attributes aren't mandatory??
-//        error = true;
-//        qDebug() << "attributes not found from the response document";
-//        return error;
+        // Attributes aren't mandatory
     }
-    error &= resolveKeyAndCallSetter(object, "href", [&](const QString& href) { q->setHref(href); } );
-    error &= resolveKeyAndCallSetter(object, "createdAt", [&](const QString& creationTime) { q->setCreationTime(QDateTime::fromString(creationTime, Qt::ISODate)); } );
-    error &= resolveKeyAndCallSetter(object, "deviceId", [&](const QString& deviceId) { q->setDeviceId(deviceId); } );
-    error &= resolveKeyAndCallSetter(object, "name", [&](const QString& name) { q->setName(name); } );
-    error &= resolveKeyAndCallSetter(object, "description", [&](const QString& desc) { q->setDescription(desc); } );
-    error &= resolveKeyAndCallSetter(object, "type", [&](const QString& type) { q->setType(type); } );
-    error &= resolveKeyAndCallSetter(object, "manufacturer", [&](const QString& manufacturer) { q->setManufacturer(manufacturer); } );
+
+    const bool NOT_MANDATORY_ATTRIBUTE = false;
+
+    q->setHref( getValue(object, "href", QJsonValue::String, NOT_MANDATORY_ATTRIBUTE).toString() );
+    q->setCreationTime( QDateTime::fromString( getValue(object, "createdAt", QJsonValue::String ).toString(), Qt::ISODate) );
+    q->setDeviceId( getValue(object, "deviceId", QJsonValue::String).toString() );
+    q->setName( getValue(object, "name", QJsonValue::String).toString() );
+    q->setDescription( getValue(object, "description", QJsonValue::String, NOT_MANDATORY_ATTRIBUTE).toString() );
+    q->setType( getValue(object, "type", QJsonValue::String).toString() );
+    q->setManufacturer( getValue(object, "manufacturer", QJsonValue::String, NOT_MANDATORY_ATTRIBUTE).toString() );
     return !error;
 }
 
@@ -168,14 +168,14 @@ void DevicePrivate::onCreateFinished()
     emit q->registerFinished(!error);
 }
 
-void DevicePrivate::onGetFinished()
+void DevicePrivate::onGetDetailsFinished()
 {
     Q_Q(Device);
     m_getError.reset();
     bool error = true;
     try {
-        if (isValidResponse(*m_getResponse, m_getError, 200)) {
-            error = !initialize(getObject(m_getResponse->document()));
+        if (isValidResponse(*m_getDetailsResponse, m_getError, 200)) {
+            error = !initialize(getObject(m_getDetailsResponse->document()));
         }
     } catch (std::exception& exception) {
         m_getError.setErrorType(Error::ErrorType::GenericError);

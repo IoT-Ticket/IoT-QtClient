@@ -51,37 +51,29 @@ void DeviceListPrivate::onGetFinished()
 {
     Q_Q(DeviceList);
     bool error = true;
+    m_devices.clear();
     try {
         if (isValidResponse(*m_getResponse, m_getError, 200)) {
-            m_devices.clear();
             error = false;
             m_getError.reset();
-            QJsonDocument responseDoc = m_getResponse->document();
-            if (responseDoc.isObject()) {
-                QJsonObject rootObject = responseDoc.object();
-                int offset = rootObject["offset"].toInt();
-                Q_UNUSED(offset);
-                int limit = rootObject["limit"].toInt();
-                Q_UNUSED(limit);
-                int fullSize = rootObject["fullSize"].toInt();
-                Q_UNUSED(fullSize);
-                QJsonArray items = rootObject["items"].toArray();
-                if (!items.isEmpty()) {
-                    foreach (const QJsonValue& item, items) {
-                        if (item.isObject()) {
-                            Device* device = Device::fromJson(item.toObject());
-                            if (device) m_devices << device;
-                            else {
-                                // TODO what error type??
-                                error = true;
-                                break;
-                            }
-                        } else {
-                            error = true;
-                        }
-                    }
+
+            const QJsonObject rootObject = getObject(m_getResponse->document());
+            int offset = getValue(rootObject, "offset", QJsonValue::Double).toInt();
+            Q_UNUSED(offset);
+            int limit = getValue(rootObject, "limit", QJsonValue::Double).toInt();
+            Q_UNUSED(limit);
+            int fullSize = getValue(rootObject, "fullSize", QJsonValue::Double).toInt();
+            const QJsonArray items = getValue(rootObject, "items", QJsonValue::Array, fullSize != 0).toArray();
+            foreach (auto item, items) {
+                Device* device = Device::fromJson(getObject(item));
+                if (device) m_devices << device;
+                else {
+                    // TODO what error type??
+                    error = true;
+                    break;
                 }
             }
+
         }
     } catch (std::exception& exception) {
         m_getError.setErrorType(Error::ErrorType::GenericError);
