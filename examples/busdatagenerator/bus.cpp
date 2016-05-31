@@ -30,7 +30,7 @@ Bus::Bus(iot::Device* device, QObject *parent) :
     m_fuelConsumptionDataNode->setDataType(iot::DataNode::Double);
     m_device->addDataNode(m_fuelConsumptionDataNode);
 
-    connect(m_speedDataNode, iot::DataNode::writeFinished, [this](bool success) {
+    connect(m_speedDataNode, &iot::DataNode::writeFinished, [this](bool success) {
         if (success) {
             qDebug() << m_device->name() << " speed value written";
         } else {
