@@ -155,6 +155,12 @@ QList<QPair<QVariant, QDateTime>> DataNode::values() const
     return d->m_values;
 }
 
+QList<QPair<Statistics, QDateTime> > DataNode::statistics() const
+{
+    Q_D(const DataNode);
+    return d->m_statistics;
+}
+
 QPair<QVariant, QDateTime> DataNode::latestValue() const
 {
     Q_D(const DataNode);
@@ -227,10 +233,23 @@ bool DataNode::readValues(const QDateTime& startTime)
     return d->readValues(startTime);
 }
 
+bool DataNode::readStatistics(const QDateTime &startTime, const QDateTime &endTime, const DataNode::Grouping &grouping)
+{
+    Q_D(DataNode);
+    return d->readStatistics(startTime, endTime, grouping);
+}
+
+
 bool DataNode::isReadyToRead() const
 {
     Q_D(const DataNode);
     return d->isReadyToRead();
+}
+
+bool DataNode::isReadyToReadStatistics() const
+{
+    Q_D(const DataNode);
+    return d->isReadyToReadStatistics();
 }
 
 bool DataNode::isReadyToWrite() const
@@ -249,6 +268,12 @@ Error* DataNode::readError()
 {
     Q_D(DataNode);
     return &d->m_readError;
+}
+
+Error *DataNode::readStatisticsError()
+{
+    Q_D(DataNode);
+    return &d->m_readStatisticsError;
 }
 
 bool DataNode::operator ==(const DataNode &other) const

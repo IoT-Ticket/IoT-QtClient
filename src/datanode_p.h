@@ -27,6 +27,7 @@
 #include "item_p.h"
 #include "response.h"
 #include "error.h"
+#include "statistics.h"
 
 namespace iot
 {
@@ -47,24 +48,32 @@ public:
     int m_writeCount; // Review, mky, 20160329: Should be added to init list
     QScopedPointer<Response> m_writeResponse;
     QScopedPointer<Response> m_readResponse;
+    QScopedPointer<Response> m_readStatisticsResponse;
     Error m_writeError;
     Error m_readError;
+    Error m_readStatisticsError;
     QList<QPair<QVariant, qint64>> m_cachedValues;
     bool m_writingCachedValues;
     QList<QPair<QVariant, QDateTime>> m_values;
+
+    QList<QPair<Statistics, QDateTime>> m_statistics;
 
     bool initialize(const QJsonObject& object);
     bool writeValues(const QList<QPair<QVariant, qint64>>& list);
     bool writeCachedValues();
     bool readValues(const QDateTime& startTime = QDateTime(), const QDateTime& endTime = QDateTime());
+    bool readStatistics(const QDateTime& startTime, const QDateTime& endTime, const DataNode::Grouping& grouping);
     void addReadValues(const QJsonArray& values, bool notify = true);
+    void addReadStatistics(const QJsonArray& values, bool notify = true);
     bool isReadyToWrite() const;
     bool isReadyToRead() const;
+    bool isReadyToReadStatistics() const;
 
 protected slots:
 
     virtual void onWriteFinished();
     virtual void onReadFinished();
+    virtual void onReadStatisticsFinished();
 
 protected:
 

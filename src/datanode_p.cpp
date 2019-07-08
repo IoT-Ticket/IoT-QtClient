@@ -116,6 +116,19 @@ bool DataNodePrivate::readValues(const QDateTime& startTime, const QDateTime& en
     return true;
 }
 
+bool DataNodePrivate::readStatistics(const QDateTime &startTime, const QDateTime &endTime, const DataNode::Grouping &grouping)
+{
+    if (!isReadyToReadStatistics()) return false;
+
+    QMetaEnum me = QMetaEnum::fromType<DataNode::Grouping>();
+    QString path = QString("/stat/read/%1?datanodes=%2/%3&grouping=%4").arg(m_deviceId, m_path, m_name, me.valueToKey(grouping));
+    path += QString("&fromdate=%1&todate=%2").arg(startTime.toMSecsSinceEpoch()).arg(endTime.toMSecsSinceEpoch());
+
+    m_readStatisticsResponse.reset( RequestHandlerProvider::instance()->getRequest(path));
+    QObject::connect(m_readStatisticsResponse.data(), &Response::finished, this, &DataNodePrivate::onReadStatisticsFinished);
+    return true;
+}
+
 void DataNodePrivate::addReadValues(const QJsonArray& values, bool notify)
 {
     Q_Q(DataNode);
@@ -132,6 +145,33 @@ void DataNodePrivate::addReadValues(const QJsonArray& values, bool notify)
     }
 }
 
+void DataNodePrivate::addReadStatistics(const QJsonArray &values, bool notify)
+{
+    Q_Q(DataNode);
+    foreach(auto valueVal, values) {
+        const QJsonObject obj = getObject(valueVal);
+        Statistics statistics;
+
+        // These three values might not be found from response if no statistics are found.
+        statistics.setMinimum(getValue(obj, "min", QJsonValue::Double, false).toVariant());
+        statistics.setMaximum(getValue(obj, "max", QJsonValue::Double, false).toVariant());
+        statistics.setAverage(getValue(obj, "avg", QJsonValue::Double, false).toVariant());
+
+        statistics.setCount(getValue(obj, "count", QJsonValue::Double, true).toVariant());
+        statistics.setSum(getValue(obj, "sum", QJsonValue::Double, true).toVariant());
+
+        QPair<Statistics, QDateTime> statisticsTimePair;
+        statisticsTimePair.first = statistics;
+        statisticsTimePair.second = QDateTime::fromMSecsSinceEpoch((qint64)getValue(obj, "ts", QJsonValue::Double).toDouble());
+
+        m_statistics << statisticsTimePair;
+    }
+
+    if (notify) {
+        emit q->readStatisticsFinished(true);
+    }
+}
+
 bool DataNodePrivate::isReadyToWrite() const
 {
     return m_writeResponse.data() == nullptr;
@@ -140,6 +180,11 @@ bool DataNodePrivate::isReadyToWrite() const
 bool DataNodePrivate::isReadyToRead() const
 {
     return m_readResponse.data() == nullptr;
+}
+
+bool DataNodePrivate::isReadyToReadStatistics() const
+{
+    return m_readStatisticsResponse.data() == nullptr;
 }
 
 void DataNodePrivate::onWriteFinished()
@@ -214,6 +259,37 @@ void DataNodePrivate::onReadFinished()
 
     m_readResponse.reset(nullptr);
     emit q->readyToReadChanged(true);
+}
+
+void DataNodePrivate::onReadStatisticsFinished()
+{
+    Q_Q(DataNode);
+
+    bool error = true;
+
+    m_statistics.clear();
+    m_readStatisticsError.reset();
+
+    try {
+        if (isValidResponse(*m_readStatisticsResponse, m_readStatisticsError, 200)) {
+            error = false;
+            const QJsonObject rootObject = getObject(m_readStatisticsResponse->document());
+            const QJsonArray results = getValue(rootObject, "datanodeReads", QJsonValue::Array).toArray();
+            foreach( auto val, results) {
+                const QJsonArray valueArray = getValue(getObject(val), "values", QJsonValue::Array).toArray();
+                addReadStatistics(valueArray, false);
+            }
+        }
+    } catch (std::exception& exception) {
+        m_readStatisticsError.setErrorType(Error::ErrorType::GenericError);
+        m_readStatisticsError.setDescription(exception.what());
+        error = true;
+    }
+
+    emit q->readStatisticsFinished(!error);
+
+    m_readStatisticsResponse.reset(nullptr);
+    emit q->readyToReadStatisticsChanged(true);
 }
 
 } // namespace iot

@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += datanodewritetests \
+    datanodereadstatisticstest \
     datanodereadtests \
     devicelisttests \
     devicetests \

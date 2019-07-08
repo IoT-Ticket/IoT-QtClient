@@ -24,6 +24,7 @@
 #define DATANODE_H
 
 #include "iotlib_global.h"
+#include "statistics.h"
 
 #include <QObject>
 
@@ -48,6 +49,7 @@ class IOTLIBSHARED_EXPORT DataNode : public QObject
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
     Q_PROPERTY(QString deviceId READ deviceId WRITE setDeviceId NOTIFY deviceIdChanged)
     Q_PROPERTY(bool readyToRead READ isReadyToRead NOTIFY readyToReadChanged)
+    Q_PROPERTY(bool readyToReadStatistics READ isReadyToReadStatistics NOTIFY readyToReadStatisticsChanged)
     Q_PROPERTY(bool readyToWrite READ isReadyToWrite NOTIFY readyToWriteChanged)
 
 public:
@@ -62,6 +64,17 @@ public:
     };
 
     Q_ENUM(DataType)
+
+    enum Grouping {
+        Minute,
+        Hour,
+        Day,
+        Week,
+        Month,
+        Year
+    };
+
+    Q_ENUM(Grouping)
 
     //! \brief Constructor.
     //! \param parent Parent qobject, passed to QObject constructor.
@@ -97,6 +110,10 @@ public:
     //! \brief Return list of process values that have been read from the Iot-Ticket server.
     //! \return Process values.
     QList< QPair<QVariant, QDateTime> > values() const;
+
+    //! \brief Return list of statistical values that have been read from the Iot-Ticket server.
+    //! \return Process values.
+    QList< QPair<Statistics, QDateTime> > statistics() const;
 
     //! \brief Return latest process value that have been read from the Iot-Ticket server.
     //! \return Latest process value.
@@ -198,9 +215,23 @@ public:
     //! \return True if reading starts (datanode is ready to read).
     bool readValues(const QDateTime& startTime);
 
+    //! \brief Read statistical data from specified time range from the Iot-Ticket server.
+    //!
+    //!  This is async operation. readFinished() will be emitted once operation is done.
+    //!
+    //! \param startTime Start time for the range.
+    //! \param endTime End time for the range.
+    //! \param grouping Grouping period for the statistical data.
+    //! \return True if reading starts (datanode is ready to read).
+    bool readStatistics(const QDateTime& startTime, const QDateTime& endTime, const Grouping& grouping);
+
     //! \brief Is datanode ready to read values from IotTicket server. DataNode can read only a one patch of values at a time.
     //! \return True if ready to read.
     bool isReadyToRead() const;
+
+    //! \brief Is datanode ready to read statistics from IotTicket server. DataNode can read only a one patch of statistics at a time.
+    //! \return True if ready to read statistics.
+    bool isReadyToReadStatistics() const;
 
     //! \brief Is datanode ready to send values to the IotTicket server. DataNode can write only a one patch of values at a time.
     //! \return True if ready to write.
@@ -213,6 +244,10 @@ public:
     //! \brief Return details from the latest read operation error.
     //! \return Error details.
     Error* readError();
+
+    //! \brief Return details from the latest read statistics operation error.
+    //! \return Error details.
+    Error* readStatisticsError();
 
     //! \brief Equality operator.
     //! \return Are datanode properties identical.
@@ -262,7 +297,9 @@ signals:
     void deviceIdChanged(QString deviceId);
     void writeFinished(bool success);
     void readFinished(bool success);
+    void readStatisticsFinished(bool success);
     void readyToReadChanged(bool ready);
+    void readyToReadStatisticsChanged(bool ready);
     void readyToWriteChanged(bool ready);
 
 protected:

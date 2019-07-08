@@ -56,8 +56,6 @@ private slots:
     void readyToReadAfterReadComplete();
     void readFailesWithNetworkError();
     void readErrorClearesAfterSuccess();
-
-
 private:
 
     QJsonObject valueToObj(const QPair<QVariant,QDateTime>& valueTimestampPair) {
