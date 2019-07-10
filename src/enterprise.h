@@ -35,6 +35,9 @@ namespace iot
 class EnterprisePrivate;
 class Error;
 
+//! \brief The Enterprise class presents an enterprise on Iot-Ticket server.
+//!
+//! Enterprises can be read by using EnterpriseList class.
 class IOTLIBSHARED_EXPORT Enterprise: public QObject
 {
     Q_OBJECT
@@ -51,18 +54,39 @@ public:
     //! \brief Destructor.
     virtual ~Enterprise();
 
+    //! \brief Return Enterprise name.
+    //! \return Name.
     QString name() const;
+
+    //! \brief Return Enterprise resourceId.
+    //! \return Resource id.
     QString resourceId() const;
+
+    //! \brief Return Enterprise href.
+    //! \return Href.
     QString href() const;
+
+    //! \brief Does enterprise have sub enterprises.
+    //! \return Return true if enterprise has sub enterprises, otherwise return false.
     bool hasSubEnterprises() const;
 
 public slots:
-    void setName(const QString& name);
-    void setResourceId(const QString& resourceId);
-    void setHref(const QString& href);
-    void setHasSubEnterprises(const bool& hasSubEnterprises);
 
-    void getSubEnterprises(const QString& resourceId = QString());
+    //! \brief Set enterprise name.
+    //! \param name Name
+    void setName(const QString& name);
+
+    //! \brief Set enterprise resource id.
+    //! \param resourceId Resource id
+    void setResourceId(const QString& resourceId);
+
+    //! \brief Set enterprise Href.
+    //! \param href Href
+    void setHref(const QString& href);
+
+    //! \brief Set value indicating if enterprise has sub enterprises.
+    //! \param hasSubEnterprises A bool that indicates if enterprise has sub enterprises.
+    void setHasSubEnterprises(const bool& hasSubEnterprises);
 
 signals:
     void nameChanged(const QString &name);

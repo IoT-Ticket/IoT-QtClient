@@ -37,8 +37,11 @@ class Error;
 
 //! \brief The EnterpriseList class can be used to fetch a list of Enterprises from the IoT-Ticket
 //! server
-// TODO: write the docs.
-
+//!
+//! readEnterprises() method starts the async operation to fetch the list of enterprises.
+//! readEnterprisesFinished() is emitted once the operaton completes and after that enterprises()
+//! method can be used to access the fetched enterprises.
+//!
 class IOTLIBSHARED_EXPORT EnterpriseList : public QObject
 {
     Q_OBJECT
@@ -53,10 +56,10 @@ public:
 
     //! \brief Return list of enterprises.
     //!
-    //! Before enterpriselist is valid, enterprises needs to be fetched from the server using getEnterprisesFinished()
-    //! function.
+    //! Before enterpriselist is valid, enterprises needs to be fetched from the server using readEnterprises()
+    //! method.
     //!
-    //! \return Enterprise list.
+    //! \return list of Enterprises.
     QList<Enterprise*> enterprises();
 
     //! \brief Removes enterprise from the list. Enterprise is not destructed. Ownership of the object is removed from the enterpriseList.
@@ -69,13 +72,13 @@ public:
 
     //! \brief Return details from error.
     //! \return Error details
-    Error* getError();
+    Error* readEnterprisesError();
 
 signals:
 
     //! \brief Signal is emitted when async get opration completes.
     //! \param success True if operation finished successfully.
-    void getEnterprisesFinished(bool success);
+    void readEnterprisesFinished(bool success);
 
 public slots:
 
@@ -83,7 +86,7 @@ public slots:
     //! This is async operation. Signal readEnterprisesFinished() is emitted when operation completes.
     //! enterprises() function can be used to access the enterprises.
     //! \param parentEnterpriseId EnterpriseId of the enterprise whose sub enterprises are read.
-    //! If argument is empty user's root enterprises are read.
+    //! If argument is empty, user's root enterprises are read.
     void readEnterprises(QString parentEnterpriseId = QString());
 
 protected:

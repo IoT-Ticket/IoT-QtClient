@@ -116,9 +116,4 @@ void Enterprise::setHasSubEnterprises(const bool &hasSubEnterprises)
     }
 }
 
-void Enterprise::getSubEnterprises(const QString &enterpriseId)
-{
-
-}
-
 } // namespace iot

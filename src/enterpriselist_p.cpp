@@ -48,6 +48,7 @@ void EnterpriseListPrivate::readEnterprises(QString parentEnterpriseId)
     }
 
     // TODO: Should we be able to get more than 100 enterprises?
+    // 100 is the maximum for the limit parameter.
     path += "?limit=100";
 
     m_getResponse.reset( RequestHandlerProvider::instance()->getRequest(path) );
@@ -85,7 +86,7 @@ void EnterpriseListPrivate::onReadEnterprisesFinished()
         error = true;
     }
 
-    emit q->getEnterprisesFinished(!error);
+    emit q->readEnterprisesFinished(!error);
 
 }
 

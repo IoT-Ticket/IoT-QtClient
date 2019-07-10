@@ -23,7 +23,6 @@ public:
     QString m_href;
     bool m_hasSubEnterprises;
 
-    // bool getSubEnterprises(const QString& enterpriseId=QString());
     bool initialize(const QJsonObject& object);
 private:
 

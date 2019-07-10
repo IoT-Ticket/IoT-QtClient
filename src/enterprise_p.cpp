@@ -13,32 +13,7 @@ EnterprisePrivate::~EnterprisePrivate()
 {
 
 }
-/*
-bool EnterprisePrivate::getSubEnterprises(const QString &enterpriseId)
-{
-    // TODO: Do we need this functionality?
 
-    bool success = true;
-
-    if (!m_hasSubEnterprises){
-        success = false;
-        return success;
-    }
-
-    QString baseUrl = RequestHandlerProvider::instance()->serverUrl().toString();
-    if (!m_href.contains(baseUrl)) {
-        success = false;
-        return success;
-    }
-
-    QString path = m_href;
-    path.remove(baseUrl);
-
-    // TODO: make request
-
-    return success;
-}
-*/
 bool EnterprisePrivate::initialize(const QJsonObject &object)
 {
     Q_Q(Enterprise);
