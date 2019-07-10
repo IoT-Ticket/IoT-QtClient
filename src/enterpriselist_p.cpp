@@ -20,10 +20,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "devicelist_p.h"
-#include "device.h"
+#include "enterpriselist_p.h"
+#include "enterprise.h"
 
-#include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -31,50 +30,54 @@
 namespace iot
 {
 
-DeviceListPrivate::DeviceListPrivate(DeviceList* parent): ItemPrivate(), q_ptr(parent)
+EnterpriseListPrivate::EnterpriseListPrivate(EnterpriseList *parent): ItemPrivate(), q_ptr(parent)
 {
 
 }
 
-DeviceListPrivate::~DeviceListPrivate()
+EnterpriseListPrivate::~EnterpriseListPrivate()
 {
-
+    qDeleteAll(m_enterprises);
 }
 
-void DeviceListPrivate::get()
+void EnterpriseListPrivate::readEnterprises(QString parentEnterpriseId)
 {
-    m_getResponse.reset( RequestHandlerProvider::instance()->getRequest("/devices") );
-    QObject::connect( m_getResponse.data(), &Response::finished, this, &DeviceListPrivate::onGetFinished);
+    QString path = "/enterprises";
+    if (!parentEnterpriseId.isEmpty()) {
+        path += "/" + parentEnterpriseId;
+    }
+
+    // TODO: Should we be able to get more than 100 enterprises?
+    path += "?limit=100";
+
+    m_getResponse.reset( RequestHandlerProvider::instance()->getRequest(path) );
+    QObject::connect( m_getResponse.data(), &Response::finished, this, &EnterpriseListPrivate::onReadEnterprisesFinished);
 }
 
-void DeviceListPrivate::onGetFinished()
+void EnterpriseListPrivate::onReadEnterprisesFinished()
 {
-    Q_Q(DeviceList);
+    Q_Q(EnterpriseList);
     bool error = true;
 
-    m_devices.clear();
     try {
         if (isValidResponse(*m_getResponse, m_getError, 200)) {
             error = false;
             m_getError.reset();
 
             const QJsonObject rootObject = getObject(m_getResponse->document());
-            int offset = getValue(rootObject, "offset", QJsonValue::Double).toInt();
-            Q_UNUSED(offset);
-            int limit = getValue(rootObject, "limit", QJsonValue::Double).toInt();
-            Q_UNUSED(limit);
+
             int fullSize = getValue(rootObject, "fullSize", QJsonValue::Double).toInt();
-            const QJsonArray items = getValue(rootObject, "items", QJsonValue::Array, fullSize != 0).toArray();
-            foreach (auto item, items) {
-                Device* device = Device::fromJson(getObject(item));
-                if (device) m_devices << device;
-                else {
-                    // TODO what error type??
+            bool isMandatory = fullSize != 0;
+            const QJsonArray items = getValue(rootObject, "items", QJsonValue::Array, isMandatory).toArray();
+            foreach(auto item, items) {
+                Enterprise* enterprise = Enterprise::fromJson(getObject(item));
+                if (enterprise) {
+                    m_enterprises << enterprise;
+                } else {
                     error = true;
                     break;
                 }
             }
-
         }
     } catch (std::exception& exception) {
         m_getError.setErrorType(Error::ErrorType::GenericError);
@@ -82,7 +85,8 @@ void DeviceListPrivate::onGetFinished()
         error = true;
     }
 
-    emit q->getFinished(!error);
+    emit q->getEnterprisesFinished(!error);
+
 }
 
 } // namespace iot

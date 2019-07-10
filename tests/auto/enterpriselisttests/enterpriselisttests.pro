@@ -20,50 +20,9 @@
 # DEALINGS IN THE SOFTWARE.
 #
 
-QT       += network
-QT       -= gui
-CONFIG   += c++11
+TARGET = tst_enterpriselisttests
+TEMPLATE = app
 
-TARGET = iot
-TEMPLATE = lib
+include(../../common/unittestcommon.pri)
 
-DEFINES += IOT_LIBRARY
-
-HEADERS += device.h \
-    device_p.h \
-    enterprise.h \
-    enterprise_p.h \
-    enterpriselist.h \
-    enterpriselist_p.h \
-    requesthandler.h \
-    response.h \
-    error.h \
-    devicelist.h \
-    devicelist_p.h \
-    datanode.h \
-    datanode_p.h \
-    item_p.h \
-    connection.h \
-    connection_p.h \
-    requesthandlerprovider.h \
-    statistics.h
-
-SOURCES += device.cpp \
-    device_p.cpp \
-    devicelist.cpp \
-    devicelist_p.cpp \
-    enterprise.cpp \
-    enterprise_p.cpp \
-    enterpriselist.cpp \
-    enterpriselist_p.cpp \
-    requesthandlerprovider.cpp \
-    requesthandler.cpp \
-    response.cpp \
-    item_p.cpp \
-    error.cpp \
-    datanode.cpp \
-    datanode_p.cpp \
-    connection.cpp \
-    connection_p.cpp \
-    statistics.cpp
-
+SOURCES = tst_enterpriselisttests.cpp

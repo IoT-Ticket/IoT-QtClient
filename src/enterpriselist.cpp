@@ -20,73 +20,55 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "statistics.h"
+#include "enterpriselist.h"
+#include "enterpriselist_p.h"
 
 namespace iot {
 
-Statistics::Statistics():
-    m_minimum(QVariant()),
-    m_maximum(QVariant()),
-    m_average(QVariant()),
-    m_count(QVariant()),
-    m_sum(QVariant())
+EnterpriseList::EnterpriseList(QObject *parent) : QObject(parent), d_ptr(new EnterpriseListPrivate(this))
+{
+}
+
+EnterpriseList::EnterpriseList(EnterpriseListPrivate &dd, QObject *parent) : QObject(parent), d_ptr(&dd)
+{
+}
+
+EnterpriseList::~EnterpriseList()
 {
 
 }
 
-Statistics::~Statistics()
+QList<Enterprise *> EnterpriseList::enterprises()
 {
+    Q_D(EnterpriseList);
+    return d->m_enterprises;
+}
+
+void EnterpriseList::removeEnterprise(Enterprise *enterprise)
+{
+    Q_D(EnterpriseList);
+    d->m_enterprises.removeOne(enterprise);
 
 }
 
-QVariant Statistics::minimum() const
+void EnterpriseList::removeEnterprises(QList<Enterprise *> enterprises)
 {
-    return m_minimum;
+    foreach(auto enterprise, enterprises) {
+        removeEnterprise(enterprise);
+    }
 }
 
-void Statistics::setMinimum(const QVariant &minimum)
+Error *EnterpriseList::getError()
 {
-    m_minimum = minimum;
+    Q_D(EnterpriseList);
+    return &d->m_getError;
 }
 
-QVariant Statistics::maximum() const
+void EnterpriseList::readEnterprises(QString parentEnterpriseId)
 {
-    return m_maximum;
+    Q_D(EnterpriseList);
+    d->readEnterprises(parentEnterpriseId);
 }
 
-void Statistics::setMaximum(const QVariant &maximum)
-{
-    m_maximum = maximum;
-}
-
-QVariant Statistics::average() const
-{
-    return m_average;
-}
-
-void Statistics::setAverage(const QVariant &average)
-{
-    m_average = average;
-}
-
-QVariant Statistics::count() const
-{
-    return m_count;
-}
-
-void Statistics::setCount(const QVariant &count)
-{
-    m_count = count;
-}
-
-QVariant Statistics::sum() const
-{
-    return m_sum;
-}
-
-void Statistics::setSum(const QVariant &sum)
-{
-    m_sum = sum;
-}
 
 }

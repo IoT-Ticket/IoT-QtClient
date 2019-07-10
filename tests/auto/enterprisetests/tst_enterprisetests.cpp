@@ -20,73 +20,34 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "statistics.h"
+#include "tst_testbase.h"
 
-namespace iot {
+class EnterpriseTests : public TestBase
+{
+    Q_OBJECT
+public:
+    EnterpriseTests() : TestBase() {};
 
-Statistics::Statistics():
-    m_minimum(QVariant()),
-    m_maximum(QVariant()),
-    m_average(QVariant()),
-    m_count(QVariant()),
-    m_sum(QVariant())
+private slots:
+    void test_case1();
+
+};
+
+EnterpriseTests::EnterpriseTests()
 {
 
 }
 
-Statistics::~Statistics()
+EnterpriseTests::~EnterpriseTests()
 {
 
 }
 
-QVariant Statistics::minimum() const
+void EnterpriseTests::test_case1()
 {
-    return m_minimum;
-}
-
-void Statistics::setMinimum(const QVariant &minimum)
-{
-    m_minimum = minimum;
-}
-
-QVariant Statistics::maximum() const
-{
-    return m_maximum;
-}
-
-void Statistics::setMaximum(const QVariant &maximum)
-{
-    m_maximum = maximum;
-}
-
-QVariant Statistics::average() const
-{
-    return m_average;
-}
-
-void Statistics::setAverage(const QVariant &average)
-{
-    m_average = average;
-}
-
-QVariant Statistics::count() const
-{
-    return m_count;
-}
-
-void Statistics::setCount(const QVariant &count)
-{
-    m_count = count;
-}
-
-QVariant Statistics::sum() const
-{
-    return m_sum;
-}
-
-void Statistics::setSum(const QVariant &sum)
-{
-    m_sum = sum;
-}
 
 }
+
+QTEST_APPLESS_MAIN(EnterpriseTests)
+
+#include "tst_enterprisetests.moc"

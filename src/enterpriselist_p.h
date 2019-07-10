@@ -20,73 +20,44 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "statistics.h"
+#ifndef ENTERPRISELIST_P_H
+#define ENTERPRISELIST_P_H
 
-namespace iot {
+#include "requesthandlerprovider.h"
+#include "enterpriselist.h"
+#include "response.h"
+#include "error.h"
+#include "item_p.h"
 
-Statistics::Statistics():
-    m_minimum(QVariant()),
-    m_maximum(QVariant()),
-    m_average(QVariant()),
-    m_count(QVariant()),
-    m_sum(QVariant())
+#include <QObject>
+
+namespace iot
 {
 
-}
-
-Statistics::~Statistics()
+class EnterpriseListPrivate : public ItemPrivate
 {
+    Q_OBJECT
+public:
+    explicit EnterpriseListPrivate(EnterpriseList* parent);
+    virtual ~EnterpriseListPrivate();
 
-}
+    void readEnterprises(QString parentEnterpriseId = QString());
 
-QVariant Statistics::minimum() const
-{
-    return m_minimum;
-}
+    Error m_getError;
+    QScopedPointer<Response> m_getResponse;
+    QList<Enterprise*> m_enterprises;
 
-void Statistics::setMinimum(const QVariant &minimum)
-{
-    m_minimum = minimum;
-}
+protected slots:
 
-QVariant Statistics::maximum() const
-{
-    return m_maximum;
-}
+    void onReadEnterprisesFinished();
 
-void Statistics::setMaximum(const QVariant &maximum)
-{
-    m_maximum = maximum;
-}
+protected:
 
-QVariant Statistics::average() const
-{
-    return m_average;
-}
+    Q_DECLARE_PUBLIC(EnterpriseList)
+    EnterpriseList* const q_ptr;
 
-void Statistics::setAverage(const QVariant &average)
-{
-    m_average = average;
-}
+};
 
-QVariant Statistics::count() const
-{
-    return m_count;
-}
+} // namespace iot
 
-void Statistics::setCount(const QVariant &count)
-{
-    m_count = count;
-}
-
-QVariant Statistics::sum() const
-{
-    return m_sum;
-}
-
-void Statistics::setSum(const QVariant &sum)
-{
-    m_sum = sum;
-}
-
-}
+#endif // ENTERPRISELIST_P_H

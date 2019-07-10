@@ -217,12 +217,12 @@ public:
 
     //! \brief Read statistical data from specified time range from the Iot-Ticket server.
     //!
-    //!  This is async operation. readFinished() will be emitted once operation is done.
+    //!  This is async operation. readStatisticsFinished() will be emitted once operation is done.
     //!
     //! \param startTime Start time for the range.
     //! \param endTime End time for the range.
     //! \param grouping Grouping period for the statistical data.
-    //! \return True if reading starts (datanode is ready to read).
+    //! \return True if reading starts (datanode is ready to read statistics).
     bool readStatistics(const QDateTime& startTime, const QDateTime& endTime, const Grouping& grouping);
 
     //! \brief Is datanode ready to read values from IotTicket server. DataNode can read only a one patch of values at a time.

@@ -5,6 +5,7 @@ SUBDIRS += datanodewritetests \
     datanodereadtests \
     devicelisttests \
     devicetests \
+    enterpriselisttests \
     getdevicedatanodestests \
     getdevicedetailstests \
     registerdevicetests \

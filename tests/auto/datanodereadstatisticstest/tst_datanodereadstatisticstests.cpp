@@ -22,8 +22,6 @@
 
 #include "tst_testbase.h"
 
-// add necessary includes here
-
 class DataNodeReadStatisticsTests : public TestBase
 {
     Q_OBJECT
@@ -307,9 +305,8 @@ void DataNodeReadStatisticsTests::readStatisticsErrorClearedAfterSuccess()
 
     QCOMPARE( m_readStatisticsFinishedSpy->count(), 1 );
     QCOMPARE( m_readStatisticsFinishedSpy->takeFirst().at(0).toBool(), true );
-    QCOMPARE( m_dataNode->readError()->errorType(), Error::ErrorType::NoError);
-    QCOMPARE( m_dataNode->readError()->networkError(), QNetworkReply::NoError);
-
+    QCOMPARE( m_dataNode->readError()->errorType(), Error::ErrorType::NoError );
+    QCOMPARE( m_dataNode->readError()->networkError(), QNetworkReply::NoError );
 }
 
 QTEST_APPLESS_MAIN(DataNodeReadStatisticsTests)
