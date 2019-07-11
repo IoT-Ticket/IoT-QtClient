@@ -58,7 +58,7 @@ void EnterpriseList::removeEnterprises(QList<Enterprise *> enterprises)
     }
 }
 
-Error *EnterpriseList::getError()
+Error *EnterpriseList::readEnterprisesError()
 {
     Q_D(EnterpriseList);
     return &d->m_getError;

@@ -38,7 +38,7 @@ private slots:
 
     void init() {
         m_enterpriseList = new EnterpriseList();
-        m_readEnterprisesFinishedSpy = new QSignalSpy(m_enterpriseList, &iot::EnterpriseList::getEnterprisesFinished);
+        m_readEnterprisesFinishedSpy = new QSignalSpy(m_enterpriseList, &iot::EnterpriseList::readEnterprisesFinished);
     }
 
     void cleanup() {
@@ -142,8 +142,8 @@ void EnterpriseListTests::readEnterprisesFailesWithNetworkError()
     QCOMPARE(m_readEnterprisesFinishedSpy->count(), 1);
     QCOMPARE(m_readEnterprisesFinishedSpy->takeFirst().at(0).toBool(), false);
     QVERIFY(m_enterpriseList->enterprises().isEmpty());
-    QCOMPARE(m_enterpriseList->getError()->errorType(), Error::ErrorType::NetworkError);
-    QCOMPARE(m_enterpriseList->getError()->networkError(), QNetworkReply::TimeoutError);
+    QCOMPARE(m_enterpriseList->readEnterprisesError()->errorType(), Error::ErrorType::NetworkError);
+    QCOMPARE(m_enterpriseList->readEnterprisesError()->networkError(), QNetworkReply::TimeoutError);
 }
 
 void EnterpriseListTests::readEnterprisesFailesWithServerErrorResponse()
@@ -156,11 +156,11 @@ void EnterpriseListTests::readEnterprisesFailesWithServerErrorResponse()
     QCOMPARE(m_readEnterprisesFinishedSpy->count(), 1);
     QCOMPARE(m_readEnterprisesFinishedSpy->takeFirst().at(0).toBool(), false);
 
-    QVERIFY(m_enterpriseList->getError()->errorType() == Error::ErrorType::HttpError);
-    QVERIFY(m_enterpriseList->getError()->httpStatusCode() == 400);
-    QVERIFY(m_enterpriseList->getError()->description() == "desc");
-    QVERIFY(m_enterpriseList->getError()->moreInfo() == "info");
-    QVERIFY(m_enterpriseList->getError()->serverErrorCode() == 8000);
+    QVERIFY(m_enterpriseList->readEnterprisesError()->errorType() == Error::ErrorType::HttpError);
+    QVERIFY(m_enterpriseList->readEnterprisesError()->httpStatusCode() == 400);
+    QVERIFY(m_enterpriseList->readEnterprisesError()->description() == "desc");
+    QVERIFY(m_enterpriseList->readEnterprisesError()->moreInfo() == "info");
+    QVERIFY(m_enterpriseList->readEnterprisesError()->serverErrorCode() == 8000);
 }
 
 void EnterpriseListTests::readEnterprisesFailesWithHttpStatus_400()
@@ -171,8 +171,8 @@ void EnterpriseListTests::readEnterprisesFailesWithHttpStatus_400()
     QCOMPARE(m_readEnterprisesFinishedSpy->takeFirst().at(0).toBool(), false);
 
     QCOMPARE(m_enterpriseList->enterprises().count(), 0);
-    QCOMPARE(m_enterpriseList->getError()->errorType(), Error::ErrorType::HttpError);
-    QCOMPARE(m_enterpriseList->getError()->httpStatusCode(), 400);
+    QCOMPARE(m_enterpriseList->readEnterprisesError()->errorType(), Error::ErrorType::HttpError);
+    QCOMPARE(m_enterpriseList->readEnterprisesError()->httpStatusCode(), 400);
 }
 
 void EnterpriseListTests::readEnterprisesErrorClearesAfterSuccess()
@@ -213,8 +213,8 @@ void EnterpriseListTests::readEnterprisesErrorClearesAfterSuccess()
     QCOMPARE(m_readEnterprisesFinishedSpy->takeFirst().at(0).toBool(), true);
     QCOMPARE(m_enterpriseList->enterprises().count(), 2);
 
-    QCOMPARE( m_enterpriseList->getError()->errorType(), Error::ErrorType::NoError );
-    QCOMPARE( m_enterpriseList->getError()->networkError(), QNetworkReply::NoError );
+    QCOMPARE( m_enterpriseList->readEnterprisesError()->errorType(), Error::ErrorType::NoError );
+    QCOMPARE( m_enterpriseList->readEnterprisesError()->networkError(), QNetworkReply::NoError );
 
     QCOMPARE(m_enterpriseList->enterprises().at(0)->name(), "name1");
     QCOMPARE(m_enterpriseList->enterprises().at(0)->href(), "foo");

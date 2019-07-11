@@ -56,6 +56,8 @@ class IOTLIBSHARED_EXPORT Device : public QObject
     Q_PROPERTY(QDateTime creationTime READ creationTime WRITE setCreationTime NOTIFY creationTimeChanged)
     Q_PROPERTY(QString deviceId READ deviceId WRITE setDeviceId NOTIFY deviceIdChanged)
     Q_PROPERTY(QString href READ href NOTIFY hrefChanged)
+    Q_PROPERTY(QString enterpriseId READ enterpriseId WRITE setEnterpriseId NOTIFY enterpriseIdChanged)
+    Q_PROPERTY(QString enterpriseName READ enterpriseName WRITE setEnterpriseName NOTIFY enterpriseNameChanged)
     Q_PROPERTY(Error* registerError READ registerError NOTIFY registerErrorChanged)
     Q_PROPERTY(Error* getDetailsError READ getDetailsError NOTIFY getDetailsErrorChanged)
 public:
@@ -90,6 +92,14 @@ public:
     //! \brief Return device href.
     //! \return Device href.
     QString href() const;
+
+    //! \brief Return id of the enterprise this device belongs to.
+    //! \return Enterprise id.
+    QString enterpriseId() const;
+
+    //! \brief Return name of the enterprise this device belongs to.
+    //! \return Enterprise name.
+    QString enterpriseName() const;
 
     //! \brief Return device attributes.
     //! \return Attributes.
@@ -185,6 +195,14 @@ public slots:
     //! \param href Href.
     void setHref(const QString& href);
 
+    //! \brief Set id of the enterprise this device belongs to.
+    //! \param enterpriseId Id of the enterprise this device belongs to.
+    void setEnterpriseId(const QString& enterpriseId);
+
+    //! \brief Set name of the enterprise this device belongs to.
+    //! \param enterpriseName Enterprise name.
+    void setEnterpriseName(const QString& enterpriseName);
+
     //! \brief Set device attributes.
     //! \param attributes Attributes.
     void setAttributes(const QVariantMap& attributes);
@@ -249,6 +267,8 @@ signals:
     void getDetailsFinished(bool success);
     void getDataNodesFinished(bool success);
     void readDataNodeValuesFinished(bool success);
+    void enterpriseIdChanged(const QString& enterpriseId);
+    void enterpriseNameChanged(const QString& enterpriseName);
 
 protected:
 

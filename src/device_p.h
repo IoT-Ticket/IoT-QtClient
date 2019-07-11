@@ -48,6 +48,9 @@ public:
     QString m_description;
     QString m_deviceId;
     QString m_href;
+    QString m_enterpriseId;
+    QString m_enterpriseName;
+
     QDateTime m_creationTime;
     QVariantMap m_attributes;
     QList<DataNode*> m_dataNodes;

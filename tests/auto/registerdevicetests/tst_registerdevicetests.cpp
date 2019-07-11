@@ -55,6 +55,7 @@ private slots:
 
     void createWithEmpyAttributes();
     void createWithAttributes();
+    void createWithOptionalFields();
     void creationFailesWithNetworkError();
     void creationFailesWithServerErrorResponse();
     void creationFailesWithHttpStatus_200();
@@ -123,6 +124,39 @@ void RegisterDeviceTests::createWithAttributes()
     // verify that path is correct and the request document is expected
     QCOMPARE(QString("/devices/"), m_requestHandler->postRequestPath());
     QCOMPARE(QJsonDocument::fromJson(m_requestHandler->postData()), createRequestDocument());
+
+    QDateTime responseCreationTime = QDateTime::currentDateTime();
+    QString responseDeviceId = "123";
+
+    // Now lets construct a response
+    m_requestHandler->postRequestResponse()->offerResponse(201, createResponseDocument(responseDeviceId, responseCreationTime));
+
+    QCOMPARE( m_registerFinishedSpy->count(), 1 );
+    QCOMPARE( m_registerFinishedSpy->takeFirst().at(0).toBool(), true );
+    QVERIFY(m_creationTimeSpy->count() == 1);
+    QVERIFY(m_deviceIdSpy->count() == 1);
+    QCOMPARE(m_device->deviceId(), responseDeviceId);
+    QCOMPARE(m_device->creationTime().toString(), responseCreationTime.toString());
+}
+
+void RegisterDeviceTests::createWithOptionalFields()
+{
+    m_device->setEnterpriseId("E1234");
+    m_device->registerDevice();
+
+    QJsonObject returnedDocument
+    {
+        {"name", m_device->name()},
+        {"manufacturer", m_device->manufacturer()},
+        {"enterpriseId", m_device->enterpriseId()},
+        {"type", m_device->type()},
+        {"description", m_device->description()},
+        {"attributes", QJsonArray()}
+    };
+
+    // verify that path is correct and the request document is expected
+    QCOMPARE(QString("/devices/"), m_requestHandler->postRequestPath());
+    QCOMPARE(QJsonDocument::fromJson(m_requestHandler->postData()), QJsonDocument(returnedDocument));
 
     QDateTime responseCreationTime = QDateTime::currentDateTime();
     QString responseDeviceId = "123";

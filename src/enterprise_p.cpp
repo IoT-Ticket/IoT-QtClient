@@ -4,7 +4,9 @@
 
 namespace iot {
 
-EnterprisePrivate::EnterprisePrivate(Enterprise *parent): ItemPrivate(), q_ptr(parent)
+EnterprisePrivate::EnterprisePrivate(Enterprise *parent): ItemPrivate(),
+    m_hasSubEnterprises(false),
+    q_ptr(parent)
 {
 
 }

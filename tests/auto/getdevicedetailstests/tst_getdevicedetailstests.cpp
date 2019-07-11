@@ -46,6 +46,8 @@ private slots:
         m_expectedDevice->setHref("http://address/");
         m_expectedDevice->setAttributes({ {"attrib1", "attrib1value"} });
         m_expectedDevice->setCreationTime(QDateTime::currentDateTime());
+        m_expectedDevice->setEnterpriseId("E1234");
+        m_expectedDevice->setEnterpriseName("enterprise1");
         m_getDetailsFinishedSpy = new QSignalSpy(m_device, SIGNAL(getDetailsFinished(bool)));
     }
 
@@ -79,7 +81,9 @@ private:
             {"description", m_expectedDevice->description()},
             {"href", m_expectedDevice->href()},
             {"createdAt", m_expectedDevice->creationTime().toString(Qt::ISODate)},
-            {"attributes", attributesArray}
+            {"enterpriseId", m_expectedDevice->enterpriseId()},
+            {"enterpriseName", m_expectedDevice->enterpriseName()},
+            {"attributes", attributesArray},
         };
 
         return QJsonDocument(obj);

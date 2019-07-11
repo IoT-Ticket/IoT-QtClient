@@ -91,6 +91,18 @@ QString Device::href() const
     return d->m_href;
 }
 
+QString Device::enterpriseId() const
+{
+    Q_D(const Device);
+    return d->m_enterpriseId;
+}
+
+QString Device::enterpriseName() const
+{
+    Q_D(const Device);
+    return d->m_enterpriseName;
+}
+
 void Device::setName(const QString &name)
 {
     Q_D(Device);
@@ -235,6 +247,24 @@ void Device::setHref(const QString& href)
     }
 }
 
+void Device::setEnterpriseId(const QString &enterpriseId)
+{
+    Q_D(Device);
+    if (d->m_enterpriseId != enterpriseId) {
+        d->m_enterpriseId = enterpriseId;
+        emit enterpriseIdChanged(d->m_enterpriseId);
+    }
+}
+
+void Device::setEnterpriseName(const QString &enterpriseName)
+{
+    Q_D(Device);
+    if (d->m_enterpriseName != enterpriseName) {
+        d->m_enterpriseName = enterpriseName;
+        emit enterpriseNameChanged(d->m_enterpriseName);
+    }
+}
+
 void Device::setCreationTime(const QDateTime& creationTime)
 {
     Q_D(Device);
@@ -253,7 +283,9 @@ bool Device::operator ==(const Device &other) const
         deviceId() == other.deviceId() &&
         attributes() == other.attributes() &&
         creationTime().toString(Qt::ISODate) == other.creationTime().toString(Qt::ISODate) &&
-        href() == other.href();
+        href() == other.href() &&
+        enterpriseId() == enterpriseId() &&
+        enterpriseName() == enterpriseName();
 }
 
 void Device::registerDevice()

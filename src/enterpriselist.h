@@ -54,7 +54,7 @@ public:
     //! \brief Destructor.
     virtual ~EnterpriseList();
 
-    //! \brief Return list of enterprises.
+    //! \brief Return list of enterprises. Ownership of the enterprises is kept by the EnterpriseList.
     //!
     //! Before enterpriselist is valid, enterprises needs to be fetched from the server using readEnterprises()
     //! method.

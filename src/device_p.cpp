@@ -53,6 +53,10 @@ void DevicePrivate::registerDevice() {
         {"attributes", attributesArray}
     };
 
+    if (!m_enterpriseId.isEmpty()) {
+        obj["enterpriseId"] = m_enterpriseId;
+    }
+
     QJsonDocument doc(obj);
     m_createResponse.reset( RequestHandlerProvider::instance()->postRequest("/devices/", doc.toJson()) );
     QObject::connect( m_createResponse.data(), &Response::finished, this, &DevicePrivate::onCreateFinished);
@@ -106,6 +110,8 @@ bool DevicePrivate::initialize(const QJsonObject& object)
     q->setDescription( getValue(object, "description", QJsonValue::String, NOT_MANDATORY_ATTRIBUTE).toString() );
     q->setType( getValue(object, "type", QJsonValue::String).toString() );
     q->setManufacturer( getValue(object, "manufacturer", QJsonValue::String, NOT_MANDATORY_ATTRIBUTE).toString() );
+    q->setEnterpriseId( getValue(object, "enterpriseId", QJsonValue::String, NOT_MANDATORY_ATTRIBUTE).toString() );
+
     return !error;
 }
 
